@@ -99,8 +99,7 @@ Dashboard
             <i class="bi bi-stopwatch"></i>
         </div>
         <span>Cobro en curso</span>
-        <strong>${{ "%.2f"|format(ingresos_en_curso) }}</strong>
-        <small>Sube cada minuto</small>
+        <strong>${{ "%.2f"|format(ingresos) }}</strong> <small>Sube cada minuto</small>
     </article>
 
 </div>
@@ -129,9 +128,9 @@ Dashboard
             <strong>E{{ "%02d"|format(espacio.numero) }}</strong>
             <small>
                 {% if espacio.estado == 'ocupado' %}
-                    {{ ticket.vehiculo.placa if ticket else 'Ocupado' }}
+                {{ ticket.vehiculo.placa if ticket else 'Ocupado' }}
                 {% else %}
-                    Libre
+                Libre
                 {% endif %}
             </small>
         </article>
@@ -186,27 +185,27 @@ Dashboard
 
 <script>
 
-Chart.defaults.color = '#b8c2d6';
-Chart.defaults.font.family = 'Inter, system-ui, sans-serif';
+    Chart.defaults.color = '#b8c2d6';
+    Chart.defaults.font.family = 'Inter, system-ui, sans-serif';
 
-const espaciosChart = document.getElementById('espaciosChart');
+    const espaciosChart = document.getElementById('espaciosChart');
 
-new Chart(espaciosChart, {
-    type: 'doughnut',
-    data: {
-        labels: ['Disponibles', 'Ocupados'],
-        datasets: [{
-            data: [
-                {{ disponibles }},
-                {{ ocupados }}
+    new Chart(espaciosChart, {
+        type: 'doughnut',
+        data: {
+            labels: ['Disponibles', 'Ocupados'],
+            datasets: [{
+                data: [
+                    {{ disponibles }},
+            {{ ocupados }}
             ],
-            backgroundColor: ['#34d399', '#fb7185'],
-            borderColor: '#182033',
-            borderWidth: 6,
-            hoverOffset: 8
-        }]
+        backgroundColor: ['#34d399', '#fb7185'],
+        borderColor: '#182033',
+        borderWidth: 6,
+        hoverOffset: 8
+    }]
     },
-    options: {
+        options: {
         maintainAspectRatio: false,
         cutout: '68%',
         plugins: {
@@ -222,24 +221,24 @@ new Chart(espaciosChart, {
     }
 });
 
-const ticketsChart = document.getElementById('ticketsChart');
+    const ticketsChart = document.getElementById('ticketsChart');
 
-new Chart(ticketsChart, {
-    type: 'bar',
-    data: {
-        labels: ['Activos', 'Finalizados'],
-        datasets: [{
-            label: 'Tickets',
-            data: [
-                {{ tickets_activos }},
-                {{ tickets_finalizados }}
+    new Chart(ticketsChart, {
+        type: 'bar',
+        data: {
+            labels: ['Activos', 'Finalizados'],
+            datasets: [{
+                label: 'Tickets',
+                data: [
+                    {{ tickets_activos }},
+            {{ tickets_finalizados }}
             ],
-            backgroundColor: ['#22d3ee', '#8b5cf6'],
-            borderRadius: 10,
-            maxBarThickness: 72
-        }]
+        backgroundColor: ['#22d3ee', '#8b5cf6'],
+        borderRadius: 10,
+        maxBarThickness: 72
+    }]
     },
-    options: {
+        options: {
         maintainAspectRatio: false,
         plugins: {
             legend: {
@@ -269,15 +268,15 @@ new Chart(ticketsChart, {
     }
 });
 
-const ocupacionChart = document.getElementById('ocupacionChart');
+    const ocupacionChart = document.getElementById('ocupacionChart');
 
-new Chart(ocupacionChart, {
-    type: 'line',
-    data: {
-        labels: ['7:00', '8:00', '9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'],
-        datasets: [{
-            label: 'Espacios ocupados',
-            data: [1, 2, 4, 6, 7, 8, {{ ocupados }}, 7, 6, 5, 3, 2],
+    new Chart(ocupacionChart, {
+        type: 'line',
+        data: {
+            labels: ['7:00', '8:00', '9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'],
+            datasets: [{
+                label: 'Espacios ocupados',
+                data: [1, 2, 4, 6, 7, 8, {{ ocupados }}, 7, 6, 5, 3, 2],
             borderColor: '#22d3ee',
             backgroundColor: 'rgba(34, 211, 238, .14)',
             fill: true,
@@ -287,7 +286,7 @@ new Chart(ocupacionChart, {
             pointRadius: 4
         }]
     },
-    options: {
+        options: {
         maintainAspectRatio: false,
         plugins: {
             legend: {
@@ -317,9 +316,9 @@ new Chart(ocupacionChart, {
     }
 });
 
-setTimeout(() => {
-    window.location.reload();
-}, 60000);
+    setTimeout(() => {
+        window.location.reload();
+    }, 60000);
 
 </script>
 
