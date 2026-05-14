@@ -1,0 +1,326 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block page_title %}
+Dashboard
+{% endblock %}
+
+{% block content %}
+
+{% set porcentaje_ocupacion = (ocupados * 100 / total_espacios) if total_espacios else 0 %}
+
+<div class="hero-strip">
+    <div>
+        <span class="eyebrow">Resumen operativo</span>
+        <h2>Sistema de control de estacionamientos</h2>
+        <p>Monitorea espacios, entradas activas y pagos desde un panel visual listo para operar.</p>
+
+        <div class="presentation-mode">
+            <i class="bi bi-lightning-charge"></i>
+            Modo presentacion: el cobro aumenta cada minuto
+        </div>
+    </div>
+
+    <div class="hero-metric">
+        <span>Ocupacion actual</span>
+        <strong>{{ "%.0f"|format(porcentaje_ocupacion) }}%</strong>
+    </div>
+</div>
+
+<div class="quick-actions">
+    <a href="/tickets/nuevo" class="quick-action primary-action">
+        <i class="bi bi-box-arrow-in-right"></i>
+        <span>
+            <strong>Registrar entrada</strong>
+            <small>Asignar vehiculo a un espacio libre</small>
+        </span>
+    </a>
+
+    <a href="/vehiculos/agregar" class="quick-action">
+        <i class="bi bi-car-front"></i>
+        <span>
+            <strong>Nuevo vehiculo</strong>
+            <small>Guardar placa, conductor y tipo</small>
+        </span>
+    </a>
+
+    <a href="/espacios" class="quick-action">
+        <i class="bi bi-map"></i>
+        <span>
+            <strong>Ver disponibilidad</strong>
+            <small>Revisar cajones libres y ocupados</small>
+        </span>
+    </a>
+</div>
+
+<div class="metric-grid">
+
+    <article class="metric-card accent-blue">
+        <div class="metric-icon">
+            <i class="bi bi-p-square"></i>
+        </div>
+        <span>Espacios totales</span>
+        <strong>{{ total_espacios }}</strong>
+        <small>Capacidad registrada</small>
+    </article>
+
+    <article class="metric-card accent-green">
+        <div class="metric-icon">
+            <i class="bi bi-check2-circle"></i>
+        </div>
+        <span>Disponibles</span>
+        <strong>{{ disponibles }}</strong>
+        <small>Listos para asignar</small>
+    </article>
+
+    <article class="metric-card accent-red">
+        <div class="metric-icon">
+            <i class="bi bi-car-front-fill"></i>
+        </div>
+        <span>Ocupados</span>
+        <strong>{{ ocupados }}</strong>
+        <small>Vehiculos dentro</small>
+    </article>
+
+    <article class="metric-card accent-amber">
+        <div class="metric-icon">
+            <i class="bi bi-cash-stack"></i>
+        </div>
+        <span>Ingresos</span>
+        <strong>${{ "%.2f"|format(ingresos) }}</strong>
+        <small>MXN pagado</small>
+    </article>
+
+    <article class="metric-card accent-violet">
+        <div class="metric-icon">
+            <i class="bi bi-stopwatch"></i>
+        </div>
+        <span>Cobro en curso</span>
+        <strong>${{ "%.2f"|format(ingresos_en_curso) }}</strong>
+        <small>Sube cada minuto</small>
+    </article>
+
+</div>
+
+<article class="panel-card mt-4">
+    <div class="panel-heading">
+        <div>
+            <span class="eyebrow">Mapa visual</span>
+            <h3>Espacios ocupados y libres</h3>
+        </div>
+
+        <a href="/espacios" class="panel-link">
+            Ver detalle
+            <i class="bi bi-arrow-right"></i>
+        </a>
+    </div>
+
+    <div class="parking-map compact-map">
+        {% for item in mapa_espacios %}
+        {% set espacio = item.espacio %}
+        {% set ticket = item.ticket %}
+
+        <article class="space-tile {% if espacio.estado == 'ocupado' %}is-occupied{% else %}is-free{% endif %}">
+            <span class="space-status"></span>
+            <i class="bi {% if espacio.estado == 'ocupado' %}bi-car-front-fill{% else %}bi-p-square{% endif %}"></i>
+            <strong>E{{ "%02d"|format(espacio.numero) }}</strong>
+            <small>
+                {% if espacio.estado == 'ocupado' %}
+                    {{ ticket.vehiculo.placa if ticket else 'Ocupado' }}
+                {% else %}
+                    Libre
+                {% endif %}
+            </small>
+        </article>
+        {% endfor %}
+    </div>
+</article>
+
+<div class="dashboard-grid">
+
+    <article class="panel-card">
+        <div class="panel-heading">
+            <div>
+                <span class="eyebrow">Distribucion</span>
+                <h3>Estado de espacios</h3>
+            </div>
+        </div>
+
+        <div class="chart-box">
+            <canvas id="espaciosChart"></canvas>
+        </div>
+    </article>
+
+    <article class="panel-card">
+        <div class="panel-heading">
+            <div>
+                <span class="eyebrow">Actividad</span>
+                <h3>Tickets</h3>
+            </div>
+        </div>
+
+        <div class="chart-box">
+            <canvas id="ticketsChart"></canvas>
+        </div>
+    </article>
+
+</div>
+
+<article class="panel-card mt-4">
+    <div class="panel-heading">
+        <div>
+            <span class="eyebrow">Flujo diario</span>
+            <h3>Ocupacion por hora</h3>
+        </div>
+    </div>
+
+    <div class="chart-box chart-wide">
+        <canvas id="ocupacionChart"></canvas>
+    </div>
+</article>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+Chart.defaults.color = '#b8c2d6';
+Chart.defaults.font.family = 'Inter, system-ui, sans-serif';
+
+const espaciosChart = document.getElementById('espaciosChart');
+
+new Chart(espaciosChart, {
+    type: 'doughnut',
+    data: {
+        labels: ['Disponibles', 'Ocupados'],
+        datasets: [{
+            data: [
+                {{ disponibles }},
+                {{ ocupados }}
+            ],
+            backgroundColor: ['#34d399', '#fb7185'],
+            borderColor: '#182033',
+            borderWidth: 6,
+            hoverOffset: 8
+        }]
+    },
+    options: {
+        maintainAspectRatio: false,
+        cutout: '68%',
+        plugins: {
+            legend: {
+                position: 'right',
+                labels: {
+                    color: '#b8c2d6',
+                    boxWidth: 14,
+                    padding: 18
+                }
+            }
+        }
+    }
+});
+
+const ticketsChart = document.getElementById('ticketsChart');
+
+new Chart(ticketsChart, {
+    type: 'bar',
+    data: {
+        labels: ['Activos', 'Finalizados'],
+        datasets: [{
+            label: 'Tickets',
+            data: [
+                {{ tickets_activos }},
+                {{ tickets_finalizados }}
+            ],
+            backgroundColor: ['#22d3ee', '#8b5cf6'],
+            borderRadius: 10,
+            maxBarThickness: 72
+        }]
+    },
+    options: {
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            x: {
+                grid: {
+                    display: false
+                },
+                ticks: {
+                    color: '#b8c2d6'
+                }
+            },
+            y: {
+                beginAtZero: true,
+                grid: {
+                    color: 'rgba(184,194,214,.12)'
+                },
+                ticks: {
+                    color: '#b8c2d6',
+                    precision: 0
+                }
+            }
+        }
+    }
+});
+
+const ocupacionChart = document.getElementById('ocupacionChart');
+
+new Chart(ocupacionChart, {
+    type: 'line',
+    data: {
+        labels: ['7:00', '8:00', '9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'],
+        datasets: [{
+            label: 'Espacios ocupados',
+            data: [1, 2, 4, 6, 7, 8, {{ ocupados }}, 7, 6, 5, 3, 2],
+            borderColor: '#22d3ee',
+            backgroundColor: 'rgba(34, 211, 238, .14)',
+            fill: true,
+            tension: .35,
+            pointBackgroundColor: '#22d3ee',
+            pointBorderWidth: 0,
+            pointRadius: 4
+        }]
+    },
+    options: {
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            x: {
+                grid: {
+                    color: 'rgba(184,194,214,.09)'
+                },
+                ticks: {
+                    color: '#b8c2d6'
+                }
+            },
+            y: {
+                beginAtZero: true,
+                grid: {
+                    color: 'rgba(184,194,214,.12)'
+                },
+                ticks: {
+                    color: '#b8c2d6',
+                    precision: 0
+                }
+            }
+        }
+    }
+});
+
+setTimeout(() => {
+    window.location.reload();
+}, 60000);
+
+</script>
+
+{% endblock %}

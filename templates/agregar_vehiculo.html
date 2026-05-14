@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Agregar Vehículo
+{% endblock %}
+
+{% block page_title %}
+Registrar vehiculo
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+    <div class="col-md-6">
+
+        <div class="card shadow border-0">
+
+            <div class="card-body">
+
+                <h2 class="mb-4 fw-bold text-center">
+                    Registrar Vehículo
+                </h2>
+
+                <form method="POST">
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Placa
+                        </label>
+
+                        <input
+                            type="text"
+                            name="placa"
+                            class="form-control"
+                            placeholder="ABC-123-A"
+                            pattern="[A-Za-z]{3}-?[0-9]{3}-?[A-Za-z]"
+                            maxlength="9"
+                            title="Formato: tres letras, tres numeros y una letra. Ejemplo: ABC-123-A"
+                            oninput="this.value = this.value.toUpperCase()"
+                            required>
+
+                        <div class="form-hint">
+                            Formato: ABC-123-A. Puedes escribirla con o sin guiones.
+                        </div>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Conductor
+                        </label>
+
+                        <input
+                            type="text"
+                            name="conductor"
+                            class="form-control"
+                            required>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Tipo de Vehículo
+                        </label>
+
+                        <select
+                            name="tipo"
+                            class="form-select">
+
+                            <option value="automovil">
+                                Automóvil
+                            </option>
+
+                            <option value="motocicleta">
+                                Motocicleta
+                            </option>
+
+                            <option value="camioneta">
+                                Camioneta
+                            </option>
+
+                            <option value="otro">
+                                Otro
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="btn btn-success w-100">
+
+                        Registrar Vehículo
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Historial
+{% endblock %}
+
+{% block page_title %}
+Historial
+{% endblock %}
+
+{% block content %}
+
+<h1 class="fw-bold mb-4">
+    Historial de Tickets
+</h1>
+
+<div class="card shadow border-0">
+
+    <div class="card-body">
+
+        <table class="table table-hover align-middle">
+
+            <thead class="table-dark">
+
+                <tr>
+                    <th>ID</th>
+                    <th>Placa</th>
+                    <th>Conductor</th>
+                    <th>Entrada</th>
+                    <th>Salida</th>
+                    <th>Total</th>
+                    <th>Estado</th>
+                    <th>Pago</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for ticket in tickets %}
+
+                <tr>
+
+                    <td>{{ ticket.id }}</td>
+
+                    <td>{{ ticket.vehiculo.placa }}</td>
+
+                    <td>{{ ticket.vehiculo.conductor }}</td>
+
+                    <td>{{ ticket.hora_entrada.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+
+                    <td>
+                        {% if ticket.hora_salida %}
+                            {{ ticket.hora_salida.strftime('%Y-%m-%d %H:%M:%S') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+
+                    <td>${{ ticket.total }}</td>
+
+                    <td>
+
+                        <span class="badge bg-secondary">
+                            {{ ticket.estado }}
+                        </span>
+
+                    </td>
+
+                    <td>
+
+                        {% if ticket.estado == 'finalizado' %}
+
+                        <a href="/pagos/{{ ticket.id }}"
+                           class="btn btn-success btn-sm">
+
+                            Registrar Pago
+
+                        </a>
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

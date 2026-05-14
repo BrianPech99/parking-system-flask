@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Pagos
+{% endblock %}
+
+{% block page_title %}
+Pagos
+{% endblock %}
+
+{% block content %}
+
+<h1 class="fw-bold mb-4">
+    Historial de Pagos
+</h1>
+
+<div class="metric-grid spaces-summary">
+    <article class="metric-card accent-amber">
+        <div class="metric-icon">
+            <i class="bi bi-cash-stack"></i>
+        </div>
+        <span>Total pagado</span>
+        <strong>${{ "%.2f"|format(total_pagado) }}</strong>
+        <small>MXN acumulado</small>
+    </article>
+
+    <article class="metric-card accent-blue">
+        <div class="metric-icon">
+            <i class="bi bi-receipt"></i>
+        </div>
+        <span>Pagos registrados</span>
+        <strong>{{ pagos|length }}</strong>
+        <small>Operaciones cobradas</small>
+    </article>
+</div>
+
+<div class="card shadow border-0">
+
+    <div class="card-body">
+
+        <table class="table table-hover align-middle">
+
+            <thead class="table-dark">
+
+                <tr>
+                    <th>ID</th>
+                    <th>Ticket</th>
+                    <th>Placa</th>
+                    <th>Método</th>
+                    <th>Monto</th>
+                    <th>Fecha</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for pago in pagos %}
+
+                <tr>
+
+                    <td>{{ pago.id }}</td>
+
+                    <td>{{ pago.ticket_id }}</td>
+
+                    <td>{{ pago.ticket.vehiculo.placa }}</td>
+
+                    <td>
+
+                        <span class="badge bg-primary">
+                            {{ pago.metodo_pago }}
+                        </span>
+
+                    </td>
+
+                    <td>${{ pago.monto }}</td>
+
+                    <td>{{ pago.fecha_pago.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

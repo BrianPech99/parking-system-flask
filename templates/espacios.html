@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Mapa de espacios
+{% endblock %}
+
+{% block page_title %}
+Mapa de espacios
+{% endblock %}
+
+{% block content %}
+
+{% set porcentaje_ocupacion = (ocupados * 100 / total_espacios) if total_espacios else 0 %}
+
+<div class="hero-strip">
+    <div>
+        <span class="eyebrow">Disponibilidad en vivo</span>
+        <h2>Vista visual de cajones</h2>
+        <p>Identifica de inmediato que espacios estan libres y cuales tienen un vehiculo dentro.</p>
+    </div>
+
+    <div class="hero-metric">
+        <span>Ocupacion</span>
+        <strong>{{ "%.0f"|format(porcentaje_ocupacion) }}%</strong>
+    </div>
+</div>
+
+<div class="metric-grid spaces-summary">
+
+    <article class="metric-card accent-blue">
+        <div class="metric-icon">
+            <i class="bi bi-p-square"></i>
+        </div>
+        <span>Total</span>
+        <strong>{{ total_espacios }}</strong>
+        <small>Espacios registrados</small>
+    </article>
+
+    <article class="metric-card accent-green">
+        <div class="metric-icon">
+            <i class="bi bi-check2-circle"></i>
+        </div>
+        <span>Libres</span>
+        <strong>{{ disponibles }}</strong>
+        <small>Disponibles ahora</small>
+    </article>
+
+    <article class="metric-card accent-red">
+        <div class="metric-icon">
+            <i class="bi bi-car-front-fill"></i>
+        </div>
+        <span>Ocupados</span>
+        <strong>{{ ocupados }}</strong>
+        <small>Con ticket activo</small>
+    </article>
+
+</div>
+
+<article class="panel-card">
+    <div class="panel-heading">
+        <div>
+            <span class="eyebrow">Estacionamiento</span>
+            <h3>Mapa de espacios</h3>
+        </div>
+
+        <div class="map-legend">
+            <span><i class="legend-dot free-dot"></i> Libre</span>
+            <span><i class="legend-dot occupied-dot"></i> Ocupado</span>
+        </div>
+    </div>
+
+    <div class="map-alert">
+        <i class="bi bi-info-circle"></i>
+        <span>Los espacios en coral tienen un ticket activo; los espacios en cian estan disponibles para nuevas entradas.</span>
+    </div>
+
+    <div class="parking-lot">
+        <div class="lane-label">
+            <span>Entrada</span>
+            <i class="bi bi-arrow-right"></i>
+        </div>
+
+        <div class="parking-map">
+            {% for item in mapa_espacios %}
+            {% set espacio = item.espacio %}
+            {% set ticket = item.ticket %}
+
+            <article class="space-tile large-space {% if espacio.estado == 'ocupado' %}is-occupied{% else %}is-free{% endif %}">
+                <span class="space-status"></span>
+                <i class="bi {% if espacio.estado == 'ocupado' %}bi-car-front-fill{% else %}bi-p-square{% endif %}"></i>
+                <strong>E{{ "%02d"|format(espacio.numero) }}</strong>
+
+                {% if espacio.estado == 'ocupado' and ticket %}
+                <small>{{ ticket.vehiculo.placa }}</small>
+                <em>{{ ticket.vehiculo.conductor }}</em>
+                {% elif espacio.estado == 'ocupado' %}
+                <small>Ocupado</small>
+                <em>Sin ticket activo</em>
+                {% else %}
+                <small>Libre</small>
+                <em>Disponible</em>
+                {% endif %}
+            </article>
+            {% endfor %}
+        </div>
+
+        <div class="lane-label exit-label">
+            <i class="bi bi-arrow-left"></i>
+            <span>Salida</span>
+        </div>
+    </div>
+</article>
+
+{% endblock %}

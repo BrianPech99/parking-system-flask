@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Tickets
+{% endblock %}
+
+{% block page_title %}
+Tickets activos
+{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <h1 class="fw-bold">
+        Tickets Activos
+    </h1>
+
+    <a href="/tickets/nuevo"
+       class="btn btn-primary">
+
+        <i class="bi bi-plus-circle"></i>
+        Nueva Entrada
+
+    </a>
+
+</div>
+
+<div class="card shadow border-0">
+
+    <div class="card-body">
+
+        <table class="table table-hover align-middle">
+
+            <thead class="table-dark">
+
+                <tr>
+                    <th>ID</th>
+                    <th>Placa</th>
+                    <th>Conductor</th>
+                    <th>Espacio</th>
+                    <th>Hora Entrada</th>
+                    <th>Estado</th>
+                    <th>Tiempo</th>
+                    <th>Total actual</th>
+                    <th>Acciones</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for ticket in tickets %}
+
+                <tr>
+
+                    <td>{{ ticket.id }}</td>
+
+                    <td>{{ ticket.vehiculo.placa }}</td>
+
+                    <td>{{ ticket.vehiculo.conductor }}</td>
+
+                    <td>{{ ticket.espacio.numero }}</td>
+
+                    <td>{{ ticket.hora_entrada.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+
+                    <td>
+
+                        <span class="badge bg-success">
+                            {{ ticket.estado }}
+                        </span>
+
+                    </td>
+
+                    <td>{{ ticket.minutos_actuales }} min</td>
+
+                    <td>${{ ticket.total_actual }}</td>
+
+                    <td>
+
+                        <a href="/tickets/salida/{{ ticket.id }}"
+                           class="btn btn-danger btn-sm">
+
+                            Registrar Salida
+
+                        </a>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

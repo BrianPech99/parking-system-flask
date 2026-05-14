@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Nueva Entrada
+{% endblock %}
+
+{% block page_title %}
+Nueva entrada
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+    <div class="col-md-6">
+
+        <div class="card shadow border-0">
+
+            <div class="card-body">
+
+                <h2 class="fw-bold mb-4 text-center">
+                    Registrar Entrada
+                </h2>
+
+                <form method="POST">
+
+                    {% if not vehiculos %}
+                    <div class="empty-state mb-3">
+                        <i class="bi bi-car-front"></i>
+                        <strong>No hay vehiculos disponibles</strong>
+                        <span>Los vehiculos con ticket activo ya no aparecen en esta lista.</span>
+                        <span>Los vehiculos pagados deben registrarse de nuevo antes de crear otra entrada.</span>
+                    </div>
+                    {% endif %}
+
+                    {% if not espacios %}
+                    <div class="empty-state mb-3">
+                        <i class="bi bi-p-square"></i>
+                        <strong>No hay espacios libres</strong>
+                        <span>Registra una salida antes de crear otro ticket.</span>
+                    </div>
+                    {% endif %}
+
+                    <!-- VEHICULO -->
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Vehículo
+                        </label>
+
+                        <select
+                            name="vehiculo_id"
+                            class="form-select"
+                            required
+                            {% if not vehiculos %}disabled{% endif %}>
+
+                            {% for vehiculo in vehiculos %}
+
+                            <option value="{{ vehiculo.id }}">
+                                {{ vehiculo.placa }}
+                                -
+                                {{ vehiculo.conductor }}
+                            </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                    <!-- ESPACIO -->
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Espacio
+                        </label>
+
+                        <select
+                            name="espacio_id"
+                            class="form-select"
+                            required
+                            {% if not espacios %}disabled{% endif %}>
+
+                            {% for espacio in espacios %}
+
+                            <option value="{{ espacio.id }}">
+                                Espacio {{ espacio.numero }}
+                            </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="btn btn-success w-100"
+                        {% if not vehiculos or not espacios %}disabled{% endif %}>
+
+                        Registrar Entrada
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
